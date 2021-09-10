@@ -34,12 +34,12 @@ class TweetDB(object):
             password <str> (optional)
         """
 
-        self.host = host
-        self.port = port
-        self.usernam = username
-        self.password = password
-        self.database = database
-        self.collection = collection
+        self._host = host
+        self._port = port
+        self._username = username
+        self._password = password
+        self._database = database
+        self._collection = collection
 
         self.__connectDB()
 
@@ -48,15 +48,15 @@ class TweetDB(object):
         Connect to MongoDB client and select the database and collection from this client
         """
         # Coonect to Client
-        if self.username:
-            self.client = MongoClient(f"mongodb://{self.username}:{self.password}@{self.host}:{self.port}/")
+        if self._username:
+            self._client = MongoClient(f"mongodb://{self._username}:{self._password}@{self._host}:{self._port}/")
         else:
-            self.client = MongoClient(f"mongodb://{self.host}:{self.port}/",
+            self._client = MongoClient(f"mongodb://{self._host}:{self._port}/",
                                            serverSelectionTimeoutMS = 2000)
 
         # Check if client is connected
         try:
-            self.client.serverInfo()
+            self._client.server_info()
 
         except pymongo.errors.ServerSelectionTimeoutError as err:
 
@@ -65,8 +65,8 @@ class TweetDB(object):
 
 
         # Get collection from client
-        self.tweetDB = eval(f"self.client.{self.database}")
-        self.tweetDB = self.tweetDB[self.collection]
+        self.tweetDB = eval(f"self._client.{self._database}")
+        self.tweetDB = self.tweetDB[self._collection]
 
         return self.tweetDB
 
@@ -85,10 +85,17 @@ class TweetDB(object):
 
     def insert_tweet(self,
                      tweet_id: str,
-                     update_info: Dict):
+                     tweet_doc: Dict):
         """
         Insert  a tweet document from MongoDB with the info of 'update_info'
         tweet_id <str>
+        Assert that tweet_doc has all essential fields of a regular tweet
+
+        FIELDS = [ '_id', '_source' ]
+        _SOURCE_FIELDS = ['id','conversation_id', 'created_at',
+                                'date', 'timezone', 'tweet', 'language',
+                                 'user_id_str', 'username', 'name', 'link',
+                                 'retweet', 'date_formated']
         """
 
         self.__assert_tweet_fields(update_info)
@@ -125,5 +132,5 @@ class TweetDB(object):
             assert  field in tweet.keys(), f"{field} is not present in tweet document"
 
         for field in TWEET_ESSENCUAK_SOURCE_FIELDS:
-            assert  field in tweet['_source'].keys(), f"{field} is not present in '_source' tweet document"
+            assert  field in tweet['_source'].keys(), f"{field} is not present in filed '_source'"
 
