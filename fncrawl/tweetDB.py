@@ -49,10 +49,11 @@ class TweetDB(object):
         """
         # Coonect to Client
         if self._username:
-            self._client = MongoClient(f"mongodb://{self._username}:{self._password}@{self._host}:{self._port}/")
+            self._server_url = f"mongodb://{self._username}:{self._password}@{self._host}:{self._port}/"
         else:
-            self._client = MongoClient(f"mongodb://{self._host}:{self._port}/",
-                                           serverSelectionTimeoutMS = 2000)
+            self._server_url = f"mongodb://{self._host}:{self._port}/"
+
+        self._client = MongoClient(self._server_url, serverSelectionTimeoutMS = 2000)
 
         # Check if client is connected
         try:
