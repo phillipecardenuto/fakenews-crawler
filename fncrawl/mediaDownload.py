@@ -4,7 +4,6 @@ Download Tweet and Media Content Functions
 
 from typing import List, Dict
 from datetime import datetime
-from tqdm.contrib.concurrent import process_map
 import os, signal
 
 from .tweetDB import TweetDB
