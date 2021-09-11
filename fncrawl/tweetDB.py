@@ -6,7 +6,7 @@ import pymongo
 from pymongo import MongoClient
 
 TWEET_ESSENCIAL_FIELDS = [ '_id', '_source' ]
-TWEET_ESSENCUAK_SOURCE_FIELDS = ['id','conversation_id', 'created_at',
+TWEET_ESSENCIAL_SOURCE_FIELDS = ['id','conversation_id', 'created_at',
                                 'date', 'timezone', 'tweet', 'language',
                                  'user_id_str', 'username', 'name', 'link',
                                  'retweet', 'date_formated']
@@ -132,6 +132,6 @@ class TweetDB(object):
         for field in TWEET_ESSENCIAL_FIELDS:
             assert  field in tweet.keys(), f"{field} is not present in tweet document"
 
-        for field in TWEET_ESSENCUAK_SOURCE_FIELDS:
+        for field in TWEET_ESSENCIAL_SOURCE_FIELDS:
             assert  field in tweet['_source'].keys(), f"{field} is not present in filed '_source'"
 
