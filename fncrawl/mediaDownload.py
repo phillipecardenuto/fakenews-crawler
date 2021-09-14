@@ -6,7 +6,7 @@ from typing import List, Dict
 from datetime import datetime
 import os, signal
 
-from .tweetDB import TweetDB
+#from .tweetDB import TweetDB
 from  pathlib import Path
 from newspaper import Article
 import requests
@@ -59,9 +59,11 @@ def check_url(url):
     return True
 
 
-def follow_tweet_urls(tweet: Dict,
-                      mongo_database: TweetDB
-                      ):
+def follow_tweet_cited_article(tweet: Dict,
+                      mongo_database: TweetDB,
+                      base_dir: str,
+                      scrap_urls: bool = True,
+                      download_media: bool = True):
     """
     Follow the tweets associated urls and save all associated media urls into mongo_database
 
@@ -71,36 +73,91 @@ def follow_tweet_urls(tweet: Dict,
         mongo_database <TweetDB>:
             TweetDB object that the function will perform its operation
     """
+
     urls_media = dict()
     # Get only non-malicious urls
-
+     
     urls = tweet['_source']['urls'] if tweet['_source'].get('urls') else []
     urls = [url for url in urls if check_url(url)]
+    
+    if scrap_urls is True:
+        for url in urls:
+            try:
+                urls_media[url] = dict()
+    
+                article = Article(url)
+                article.download()
+                article.parse()
+    
+                # Keep only links, discard raw images.
+                urls_media[url]["images"] = [img for img in article.images if img.startswith("https://") or  img.startswith("http://")]
+                urls_media[url]["videos"] = list(article.movies)
+                urls_media[url]["text"] = article.text
+                urls_media[url]["top_image"] = article.top_image if a.has_top_image() else ""
+    
+            except Exception as e:
+                #print(e)
+                pass
+    
+        # Update MongoDB with media from URLs
+        if urls_media:
+            update_info = {"_source.urls_article_content":urls_media}
+            tweet_id = tweet['_source']['id']
+            mongo_database.update_tweet(tweet_id, update_info)
 
-    for url in urls:
-        try:
-            urls_media[url] = dict()
+    if download_media is True:
+        for url_id, url in enumerate(urls):
+            print(url_id, url)
+            save_dir_base = f"{base_dir}/{tweet['_source']['language']}/{tweet['_source']['id']}/cited_article/{url_id:03d}"
 
-            article = Article(url)
-            article.download()
-            article.parse()
+            #images
+            print(save_dir_base)
+            save_dir = Path(save_dir_base) / Path("images")
+            os.makedirs(save_dir, exist_ok=True)
 
-            # Keep only links, discard raw images.
-            urls_media[url]["images"] = [img for img in article.images if img.startswith("https://") or  img.startswith("http://")]
-            urls_media[url]["videos"] = list(article.movies)
-            urls_media[url]["text"] = article.text
-            urls_media[url]["top_image"] = article.top_image if a.has_top_image() else ""
+            url_content = tweet["_source"]["urls_article_content"][url]
 
-        except Exception as e:
-            #print(e)
-            pass
+            if "images" in url_content.keys():
+                images = url_content["images"]
+                for img in images:
+                    filename = os.path.basename(img)
+                    savepath = Path(save_dir) / Path(filename)
+                    savepath = str(savepath)
+                
+                    # Download image if not exists
+                    if (os.path.isfile(savepath) is False):
+                        open(savepath, "wb").write(requests.get(url).content)
 
-    # Update MongoDB with media from URLs
-    if urls_media:
-        update_info = {"_source.urls_article_content":urls_media}
-        tweet_id = tweet['_source']['id']
-        mongo_database.update_tweet(tweet_id, update_info)
+            #videos
+            save_dir = Path(save_dir_base) / Path("videos")
+            os.makedirs(save_dir, exist_ok=True)
 
+            if "videos" in url_content.keys():
+                videos = url_content["videos"]
+                for link in videos:
+                    _youtube_download(link, save_dir)
+
+            #text
+            if "text" in url_content.keys():
+                text_url = url_content["text"]
+                if text_url is not None:
+                    savepath = Path(save_dir_base) / Path("text_url.txt")
+                    savepath = str(savepath)
+    
+                    with open(savepath, "w") as text_file:
+                        text_file.write(text_url)
+
+            #top_image
+            if "top_image" in url_content.keys():
+                top_image = url_content["top_image"]
+                if top_image is not None:
+                    filename = os.path.basename(top_image)
+                    savepath = Path(save_dir_base) / Path(filename)
+                    savepath = str(savepath)
+    
+                    # Download image if not exists
+                    if (os.path.isfile(savepath) is False):
+                        open(savepath, "wb").write(requests.get(url).content)
 
 
 #########################################################
@@ -235,7 +292,10 @@ def download_tweet_videos_from_urls(tweet: Dict,
     if tweet['_source'].get('urls') is None:
         return
 
-    for url_id, url in enumerate(tweet['_source']['urls']):
+    urls = tweet['_source']['urls'] if tweet['_source'].get('urls') else []
+    urls = [url for url in urls if check_url(url)]
+    
+    for url_id, url in enumerate(urls):
 
         save_dir = f"{save_dir}/{tweet['_source']['language']}/{tweet['_source']['id']}/videos/{url_id:03d}"
 
@@ -273,5 +333,6 @@ def download_tweet_photos(tweet: Dict,
         # Download image if not exists
         if (os.path.isfile(savepath) is False) or overwrite:
             open(savepath, "wb").write(requests.get(url).content)
+
 
 
