@@ -72,7 +72,7 @@ TODO show the function that download the article media.
 
 -- Todo insert image of the database scheme
 
-```json
+```
 {'_id': <tweet_id>_raw_,
  '_index': <name_of_crawler>,
  '_source': {'id': <tweet_id>,
