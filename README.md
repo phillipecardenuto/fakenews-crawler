@@ -23,7 +23,7 @@ docker run -d  --name tweetMongoDB -p 27017:27017 mongo
 ```
 
 ### 2 - Scraping the tweets
-The scape function allow the user to input a target keyword (e.g., "COVID-19") and frame the search withing a 
+The scape function allow the user to input a target keyword (e.g., "COVID-19") and frame the search within a 
 timeline (e.g., since:2019, until: 2021).
 
 ```
