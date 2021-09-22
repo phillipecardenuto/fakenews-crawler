@@ -372,7 +372,7 @@ def download_tweet_videos_from_link(tweet: Dict,
         if not tries < 3:
             break
 
-def pcall_download_tweet_videos_from_urls(args):
+def pcall_download_tweet_media_from_urls(args):
 
     if len(args) == 3:
         tweet, save_dir, max_duration = args
@@ -381,9 +381,9 @@ def pcall_download_tweet_videos_from_urls(args):
         max_duration = 300
     else:
         raise
-    download_tweet_videos_from_urls(tweet, save_dir, max_duration)
+    download_tweet_media_from_urls(tweet, save_dir, max_duration)
 
-def download_tweet_videos_from_urls(tweet: Dict,
+def download_tweet_media_from_urls(tweet: Dict,
                          save_dir: str,
                          max_duration: int  = 300):
     """
@@ -405,8 +405,11 @@ def download_tweet_videos_from_urls(tweet: Dict,
         save_dir = f"{save_dir}/{tweet['_source']['language']}/{tweet['_source']['id']}/videos/{url_id:03d}"
 
         # Download Images and Videos using youtube_dl
-        _youtube_download(url, save_dir, max_duration)
+        output_path = _youtube_download(url, save_dir, max_duration)
 
+        # If output_path is none, try downloaing the media using request
+        if check_file(output_path) is False:
+            _request_download(url, save_dir)
 
 #########################################################
 #                Requests   handler                     #
