@@ -14,9 +14,9 @@ from .mediaDownload import (scrape_tweets,
                             download_tweet_photos,
                             pcall_download_tweet_photos,
 
-                            # Tweet Videos using URL
-                            download_tweet_videos_from_urls,
-                            pcall_download_tweet_videos_from_urls,
+                            # Tweet Videos and Photos using URL
+                            download_tweet_media_from_urls,
+                            pcall_download_tweet_media_from_urls,
 
                             # Tweet Videos using links
                             download_tweet_videos_from_link,

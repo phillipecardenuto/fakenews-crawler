@@ -13,7 +13,7 @@ import requests
 import youtube_dl
 import twint
 import exiftool
-
+from tqdm.contrib.concurrent import process_map, thread_map
 
 URL_DENIED_LIST = ['https://twitter.com']
 
@@ -121,7 +121,7 @@ def download_media_from_article_urls(tweet: Dict,
             for img in images:
                 filename = os.path.basename(img)
                 # Case the link do not specify a image
-                if not filename:
+                if not filename or (len(Path(filename).suffix) > 6):
                     continue
 
                 if len(filename) > 25:
@@ -139,14 +139,14 @@ def download_media_from_article_urls(tweet: Dict,
         for link in videos:
             savepath = _youtube_download(link, save_dir)
 
-            tries = 1
+            tries = 0
             # Perform 3 Attempts to download
             while not check_file(savepath):
-
-                _youtube_download(link, save_dir)
                 tries += 1
-                if not tries < 3:
+                if tries > 3:
                     break
+
+                savepath = _youtube_download(link, save_dir)
 
         #text
         text_url = url_content.get("text") if url_content.get("text") else []
@@ -168,15 +168,44 @@ def download_media_from_article_urls(tweet: Dict,
            savepath = str(savepath)
            _request_download(top_image, savepath)
 
-def pcall_follow_cited_articles(args):
+def pcall_follow_cited_articles(tweets: List,
+                                mongo_database: TweetDB):
 
-    if len(args) == 2:
-        tweet, mongo_database = args
-    else:
-        raise
-    if type(mongo_database) is dict:
-        mongo_database= TweetDB(**mongo_database)
-    follow_tweet_cited_article(tweet, mongo_database)
+    def follow(tweet):
+        urls_media = dict()
+        # Get only non-malicious urls
+
+        urls = tweet['_source']['urls'] if tweet['_source'].get('urls') else []
+        urls = [url for url in urls if check_url(url)]
+
+        for url in urls:
+            # Uses newspaper library to download content of an web article (newspaper or blog)
+            try:
+                urls_media[url] = dict()
+
+                article = Article(url)
+                article.download()
+                article.parse()
+
+                # Keep only links, discard raw images.(i.e. must start with https)
+                urls_media[url]["images"] = [img for img in article.images if img.startswith("https://") or  img.startswith("http://")]
+                urls_media[url]["videos"] = list(article.movies)
+                urls_media[url]["text"] = article.text
+                urls_media[url]["top_image"] = article.top_image if a.has_top_image() else ""
+
+            # Best effort approach: if an error occur, just pass
+            except Exception as e:
+                #print(e)
+                pass
+
+        # Update MongoDB with media from URLs
+        if urls_media:
+            update_info = {"_source.urls_article_content":urls_media}
+            tweet_id = tweet['_source']['id']
+            mongo_database.update_tweet(tweet_id, update_info)
+
+    thread_map(follow,
+               tweets, max_workers = 20)
 
 def follow_tweet_cited_article(tweet: Dict,
                               mongo_database: TweetDB
@@ -363,14 +392,14 @@ def download_tweet_videos_from_link(tweet: Dict,
     # Download Images and Videos using youtube_dl
     savepath = _youtube_download(link, save_dir, max_duration)
 
-    tries = 1
+    tries = 0
     while check_file(savepath) is False:
         tries += 1
-
-        save_path = _youtube_download(link, save_dir, max_duration)
-
-        if not tries < 3:
+        if tries > 3:
             break
+
+        savepath = _youtube_download(link, save_dir, max_duration)
+
 
 def pcall_download_tweet_media_from_urls(args):
 
@@ -409,7 +438,16 @@ def download_tweet_media_from_urls(tweet: Dict,
 
         # If output_path is none, try downloaing the media using request
         if check_file(output_path) is False:
-            _request_download(url, save_dir)
+           filename = os.path.basename(url)
+           # Case the link do not specify a image
+           if not filename or (len(Path(filename).suffix) > 6):
+               continue
+
+           if len(filename) > 25:
+               filename = filename[:20] + Path(filename).suffix
+           savepath = Path(save_dir) / Path(filename)
+           savepath = str(savepath)
+           _request_download(url, savepath)
 
 #########################################################
 #                Requests   handler                     #
@@ -420,13 +458,20 @@ def _request_download(url:str,
     tries = 0
 
     while(check_file(savepath) is False):
+        os.makedirs(Path(savepath).parent, exist_ok=True)
+
         tries += 1
-
-        if (os.path.isfile(savepath) is False) :
-            open(savepath, "wb").write(requests.get(url).content)
-
-        if not tries < 3:
+        if tries > 3:
             break
+
+        try:
+            if (os.path.isfile(savepath) is False) :
+                open(savepath, "wb").write(requests.get(url).content)
+        except Exception as e:
+            print(e)
+            pass
+
+
 
 def pcall_download_tweet_photos(args):
     """
