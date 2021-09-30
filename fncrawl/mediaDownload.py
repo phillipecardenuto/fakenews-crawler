@@ -55,18 +55,21 @@ def check_file(savepath):
     if (os.path.isfile(savepath) is False):
         return False
 
-    with exiftool.ExifTool() as et:
-        metadata = et.get_metadata(savepath)
+    try:
+        with exiftool.ExifTool() as et:
+            metadata = et.get_metadata(savepath)
 
-        # If metadata do not have FileSize return False
-        if not metadata.get("File:FileSize"):
-            return False
+            # If metadata do not have FileSize return False
+            if not metadata.get("File:FileSize"):
+                return False
 
-        # If FileSize is 0, return False
-        if metadata["File:FileSize"] == 0:
-            return False
+            # If FileSize is 0, return False
+            if metadata["File:FileSize"] == 0:
+                return False
 
-    return True
+        return True
+    except:
+        return False
 
 
 
@@ -195,8 +198,8 @@ def pcall_follow_cited_articles(tweets: List,
 
             # Best effort approach: if an error occur, just pass
             except Exception as e:
-                #print(e)
-                pass
+                print(e)
+                #pass
 
         # Update MongoDB with media from URLs
         if urls_media:
@@ -351,7 +354,6 @@ def _youtube_download(link: str,
 
     except Exception as e:
         print(e)
-        pass
 
     finally:
         # Disarm Timeutl alarm
@@ -469,7 +471,7 @@ def _request_download(url:str,
                 open(savepath, "wb").write(requests.get(url).content)
         except Exception as e:
             print(e)
-            pass
+            #pass
 
 
 
