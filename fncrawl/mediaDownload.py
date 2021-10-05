@@ -94,11 +94,7 @@ def pcall_download_media_from_article_urls(args):
         tweet, base_dir = args
     else:
         raise
-    with open(f"tweet_log/{tweet['_id']}.log",'w') as f:
-        f.write('processing')
     download_media_from_article_urls(tweet, base_dir)
-
-    os.remove(f"tweet_log/{tweet['_id']}.log")
 
 def download_media_from_article_urls(tweet: Dict,
                                      base_dir:str):
