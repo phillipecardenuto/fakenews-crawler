@@ -4,8 +4,8 @@ from datetime import datetime
 """
 Missing Parallel fuction for download media from articles
 """
-"""
 # Test scrape_tweets
+"""
 tweetDB = TweetDB(
                  host = 'localhost',
                  port = '5013',
@@ -21,6 +21,7 @@ tweetDB = TweetDB(
                  collection = 'tweets-8-11-Sep',
 )
 """
+"""
 tweetDB = TweetDB(
                  host = 'localhost',
                  port = '5013',
@@ -28,7 +29,15 @@ tweetDB = TweetDB(
                  collection = 'tweets-12Sep',
 )
 """
+
+tweetDB = TweetDB(
+                 host = 'localhost',
+                 port = '5013',
+                 database = 'socialTrack',
+                 collection = 'tweets-2Oct',
+)
 # follow tweet parallel
+"""
 from tqdm.contrib.concurrent import process_map, thread_map
 tweets = list(tweetDB.tweetDB.find({
                 "_source.language":{'$in': ['pt','en','es']}
@@ -37,11 +46,10 @@ database_info = {
     'host' : 'localhost',
     'port' : '5013',
     'database' : 'socialTrack',
-    'collection' : 'tweets-12Sep',
+    'collection' : 'tweets-2Oct',
 }
 pcall_follow_cited_articles(tweets, tweetDB)
 """
-
 # download tweets photos
 """
 from tqdm import tqdm
@@ -51,17 +59,15 @@ for tweet in tqdm(tweets):
 """
 
 # download tweets photos in parallel
-"""
 from tqdm.contrib.concurrent import process_map
 tweets = list(tweetDB.tweetDB.find({
                 "_source.language":{'$in': ['pt','en','es']}
 }))
 
-save_path = "/home/dejavu/datasets/social-tracker-events/collections/7Setembro/media_12"
+save_path = "/home/dejavu/datasets/social-tracker-events/collections/7Setembro/media_2oct"
 tweets = [ (t, save_path) for t in tweets]
 process_map (pcall_download_tweet_photos,
              tweets,chunksize=1)
-"""
 
 
 # download tweets media from url 
@@ -115,11 +121,16 @@ tweets = list(tweetDB.tweetDB.find({}))
 for tweet in tqdm(tweets):
     download_media_from_article_urls(tweet,"test")
 """
+
+"""
 from tqdm.contrib.concurrent import process_map
 tweets = list(tweetDB.tweetDB.find({
                 "_source.language":{'$in': ['pt','en','es']}
         }))
-save_path = "/home/dejavu/datasets/social-tracker-events/collections/7Setembro/media_l2"
-tweets = [ (t, save_path) for t in tweets]
+save_path = "/home/dejavu/datasets/social-tracker-events/collections/7Setembro/media_07"
+
+tweets = [ (t, save_path) for t in tweets if t]
+
 process_map (pcall_download_media_from_article_urls,
-             tweets, chunksize=1)
+             tweets, chunksize=10, max_workers=30 )
+"""
