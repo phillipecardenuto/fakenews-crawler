@@ -94,7 +94,11 @@ def pcall_download_media_from_article_urls(args):
         tweet, base_dir = args
     else:
         raise
+    with open(f"tweet_log/{tweet['_id']}.log",'w') as f:
+        f.write('processing')
     download_media_from_article_urls(tweet, base_dir)
+
+    os.remove(f"tweet_log/{tweet['_id']}.log")
 
 def download_media_from_article_urls(tweet: Dict,
                                      base_dir:str):
@@ -122,6 +126,7 @@ def download_media_from_article_urls(tweet: Dict,
         if "images" in url_content.keys():
             images = url_content["images"]
             for img in images:
+                # img is the img url
                 filename = os.path.basename(img)
                 # Case the link do not specify a image
                 if not filename or (len(Path(filename).suffix) > 6):
@@ -134,22 +139,14 @@ def download_media_from_article_urls(tweet: Dict,
 
                 _request_download(img, savepath)
 
-        #videos
-        save_dir = Path(save_dir_base) / Path("videos")
-        os.makedirs(save_dir, exist_ok=True)
+                tries = 0
+                # Perform 3 Attempts to download
+                while not check_file(savepath):
+                    tries += 1
+                    if tries > 3:
+                        break
 
-        videos = url_content.get("videos") if url_content.get('videos') else []
-        for link in videos:
-            savepath = _youtube_download(link, save_dir)
-
-            tries = 0
-            # Perform 3 Attempts to download
-            while not check_file(savepath):
-                tries += 1
-                if tries > 3:
-                    break
-
-                savepath = _youtube_download(link, save_dir)
+                    savepath = _youtube_download(img, save_dir, timeout=5)
 
         #text
         text_url = url_content.get("text") if url_content.get("text") else []
@@ -194,7 +191,7 @@ def pcall_follow_cited_articles(tweets: List,
                 urls_media[url]["images"] = [img for img in article.images if img.startswith("https://") or  img.startswith("http://")]
                 urls_media[url]["videos"] = list(article.movies)
                 urls_media[url]["text"] = article.text
-                urls_media[url]["top_image"] = article.top_image if a.has_top_image() else ""
+                urls_media[url]["top_image"] = article.top_image if article.has_top_image() else ""
 
             # Best effort approach: if an error occur, just pass
             except Exception as e:
@@ -287,8 +284,10 @@ def save_desc(dictMeta, directory):
             f.write(dictMeta.get('description'))
 
 def _youtube_download(link: str,
-                     directory: str,
-                      max_duration: int = 300):
+                      directory: str,
+                      max_duration: int = 300,
+                      timeout=60
+                      ):
     """
     Youtube-DL download
 
@@ -302,13 +301,13 @@ def _youtube_download(link: str,
 
         # set Timeout alarm
         signal.signal(signal.SIGALRM, handler_timeout)
-        signal.alarm(10*60)
+        signal.alarm(timeout)
 
 
         output = os.path.join(directory,'%(id)s.%(ext)s')
 
         ydl_opts = {'outtmpl': output,
-                   'socket_timeout': 60,
+                   'socket_timeout': 10,
                    'quiet': True,
                    'logger': YTQuietLogger(), # Silence Yt-dl errors
                    'match_filter': youtube_dl.utils.match_filter_func("!is_live")} # Avoid live streams
@@ -414,6 +413,7 @@ def pcall_download_tweet_media_from_urls(args):
         raise
     download_tweet_media_from_urls(tweet, save_dir, max_duration)
 
+
 def download_tweet_media_from_urls(tweet: Dict,
                          save_dir: str,
                          max_duration: int  = 300):
@@ -468,8 +468,10 @@ def _request_download(url:str,
 
         try:
             if (os.path.isfile(savepath) is False) :
-                open(savepath, "wb").write(requests.get(url).content)
+                open(savepath, "wb").write(requests.get(url,timeout=5).content)
         except Exception as e:
+            if os.path.isfile(savepath):
+                os.remove(savepath)
             print(e)
             #pass
 
