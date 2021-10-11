@@ -1,0 +1,4 @@
+git+https://github.com/phillipecardenuto/twint
+youtube-dl
+newspaper3k
+pymongo
