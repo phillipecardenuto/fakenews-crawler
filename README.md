@@ -70,39 +70,46 @@ TODO show the function that download the article media.
 
 ## Database structure
 
--- Todo insert image of the database scheme
-
 ```
 {'_id': <tweet_id>_raw_,
- '_index': <name_of_crawler>,
- '_source': {'id': <tweet_id>,
-  'conversation_id': <conversation_id>, # Thread tweet id
-  'created_at': <datetime>, # time tweet was created STRING FORMAT
-  'date': <datetime>, # date of the tweet STRING FORMAT
-  'timezone': <timezone>, # STRING FORMAT
-  'place': <tweet's country>,
-  'tweet': <tweet text>, # STRING
-  'language': <tweet text language>, # String
-  'hashtags': [],
-  'cashtags': [],
-  'user_id_str': <tweet_user_id>, # String
-  'username': <tweet_user_name>, # String
-  'name': <name>, # String
-  'link': <link to original tweet>, # String
-  'retweet': <reweet> # Bool
-  'nlikes': <number of like at time of collection>, # INT
-  'nreplies': <number of replies at time of collection>, # INT
-  'nretweets': <number of retweets>, # 'quote_url': '',
-  'video': <has embedded video>, # 1 or 0
-  'search': <query search>, # String keyword used to query the tweet
-  'urls': <list of urls cited in the tweet body text>, # List of strings,
-  'urls_article_content': {
-        <url_1>:
-              {'text': <article text> # Text found on 'url_1'
-               'images': [<img_urls>] # List of image urls found on 'url_1'
-               'videos': [<videos_urls] # List of videos urls found on 'url_1'
-              }
-        }   
+ '_index': <string> # name of the crawler's tool ,
+ '_sourc-- Todo insert image of the database scheme
+74
+e': {
+      'id': <tweet_id>,
+      'conversation_id': <conversation_id>, # Thread tweet id
+      'created_at': <string>, # time tweet was created STRING FORMAT
+      'date': <string>, # date of the tweet STRING FORMAT
+      'date_formated': <datetime>, # date of the tweet datetime FORMAT
+      'timezone': <string>, # STRING FORMAT
+      'place': {
+                    'coordinates': [<float>, <float>], # User coordinate while tweeting
+                    'type': <string> # Type of coordinate
+               },
+      'tweet': <string>, # Tweet body text
+      'language': <string>, # tweet text language
+      'hashtags': [],
+      'cashtags': [],
+      'user_id_str': <tweet_user_id>, # String
+      'username': <string>, # Username
+      'name': <string>, # name
+      'link': <string>, # Link to original tweet
+      'retweet': <bool> # Is retweet?
+      'nlikes': <int>, # Number of like at time of collection
+      'nreplies': <int>, # Number of replies at time of collection
+      'nretweets': <string>, # number of retweets
+      'quote_url': <string>, # URL to the quote tweet
+                             # ICYM: quote_tweet --> ReTweet that allows you to embed your own comments above the original tweet
+      'video': <1 or 0>, # 1 - Has video, 0 - Hasn't video
+      'search': <string>, # Keyword used while querying the tweet
+      'urls': <list>, # List of urls cited in the tweet body text,
+      'urls_article_content': {
+            <url_1>:
+                  {'text': <string> # Text found on 'url_1'
+                   'images': [<string>] # List of image urls found on 'url_1'
+                   'videos': [<string] # List of videos urls found on 'url_1'
+                  }
+      }
    }
 }
 
