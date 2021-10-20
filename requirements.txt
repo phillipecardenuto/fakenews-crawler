@@ -1,0 +1,8 @@
+git+https://github.com/phillipecardenuto/twint
+youtube-dl
+newspaper3k
+pymongo
+tqdm
+
+# We recommned you install exiftool using conda
+#conda install -c conda-forge exiftool
