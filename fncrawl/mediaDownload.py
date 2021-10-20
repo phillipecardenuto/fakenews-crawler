@@ -15,6 +15,7 @@ import twint
 import exiftool
 from tqdm.contrib.concurrent import process_map, thread_map
 
+# Deny URLS that are repeated from twitter or others (with sensitive content)
 URL_DENIED_LIST = ['https://twitter.com']
 
 def scrape_tweets(
