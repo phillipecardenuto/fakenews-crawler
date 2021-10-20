@@ -1,33 +1,45 @@
 # fakenews-crawler
-A Crawler for downloading Twitter and Newpaper Data
+A Crawler for downloading Twitter and Newspaper Data
 
 # Quick Run
 
-### Install the requirements of the lib in a python 3.6+ enviroment
+### Install the requirements of the lib in a python 3.6+ environment
+
+We recommend using a virtual environment for this (e.g., [anaconda](https://www.anaconda.com/products/individual))
 
 ``` bash
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-## Setting up the database
+The library also requires `exiftool`. A workaround to avoid `root` permission to install this module is installing it with conda:
 
-*WARNING: The instructions bellow are just a quick run for researching and developing, if you are going to use these databases in a production environment make sure to increase databases security by adding passwords and security layers.*
+```
+conda install -c conda-forge exiftool
+```
+
+After this, you should be ready to use the fakenews-crawler without problems.
+
+## Scrapping the data
+
+### 1 -  Setting up the database
+
+The library uses MongoDB to organize and store the tweets.
+As a more praticle way to install MongoDB, we recommend using docker.
+
+*WARNING: The instructions bellow are just a quick run for researching and developing, if you are going to use these databases in a production environment make sure to increase databases security by adding passwords and others security layers.*
 
 Visit [docker-library MongoDB](https://github.com/docker-library/docs/blob/master/mongo/README.md#what-is-mongodb)  or MongoDB tutorials (e.g., [Tutorial by Leon Fang](https://medium.com/@leonfeng/set-up-a-secured-mongodb-container-e895807054bd)) for more information about security.
 
-#### 1 - Initialize MongoDB
-
 ```bash
 # Warninig: we are not adding any authentication layer to the database
-docker run -d  --name tweetMongoDB -p 27017:27017 mongo
+docker run -d  --name tweetMongoDB -p 27017:27017 mongo 
 ```
 
 ### 2 - Scraping the tweets
-The scape function allow the user to input a target keyword (e.g., "COVID-19") and frame the search within a 
-timeline (e.g., since:2019, until: 2021).
+The scape function allow the user to input target keywords (e.g., "COVID-19") and frame the search within a 
+timeframe (e.g., since:2019, until: 2021).
 
 ```
-
 from fncrawl.tweetDB import TweetDB
 from fncrawl.mediaDownload import scrape_tweets
 from datetime import datetime
