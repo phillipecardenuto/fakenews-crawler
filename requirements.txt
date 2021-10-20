@@ -4,5 +4,5 @@ newspaper3k
 pymongo
 tqdm
 
-# We recommned you install exiftool using conda
+# We recommend installing exiftool using conda
 #conda install -c conda-forge exiftool

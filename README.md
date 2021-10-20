@@ -11,7 +11,7 @@ We recommend using a virtual environment for this (e.g., [anaconda](https://www.
 pip install -r requirements.txt
 ```
 
-The library also requires `exiftool`. A workaround to avoid `root` permission to install this module is installing it with conda:
+The library also requires `exiftool`. A workaround to avoid `root` permission is installing it with conda:
 
 ```
 conda install -c conda-forge exiftool
