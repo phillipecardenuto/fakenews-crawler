@@ -32,7 +32,11 @@ Visit [docker-library MongoDB](https://github.com/docker-library/docs/blob/maste
 
 ```bash
 # Warninig: we are not adding any authentication layer to the database
-docker run -d  --name tweetMongoDB -p 27017:27017 mongo 
+<<<<<<< HEAD
+docker run -d  --name tweetMongoDB -p 27017:27017 mongo
+=======
+docker run -d  --name tweetMongoDB -p <port>:27017 mongo
+>>>>>>> dev
 ```
 
 ### 2 - Scraping the tweets
