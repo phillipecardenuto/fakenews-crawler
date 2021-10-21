@@ -289,7 +289,7 @@ All scrapped tweets follows the [twint](https://github.com/twintproject/twint) d
 After downloading the tweets assets, you will find the media content of the Tweets organized as:
 
 ```bash
-<savepath> # base directory of the media database pass as input
+<savepath> # base directory of the media database (input savepath)
   └──<language> # language of the tweet (e.g., 'en' for english)
 	      └── <tweet_id> # tweet id typically is a number (e.g., '1450915222089261059')
 		      ├── cited_article # directory of all media related to URLs cited in the tweet body text
