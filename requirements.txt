@@ -3,6 +3,7 @@ youtube-dl
 newspaper3k
 pymongo
 tqdm
+PyExifTool
 
-# We recommend installing exiftool using conda
+# We recommend installing exiftool using conda, to avoid root permission
 #conda install -c conda-forge exiftool
