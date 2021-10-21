@@ -292,19 +292,19 @@ After downloading the tweets assets, you will find the media content of the Twee
 <savepath> # base directory of the media database pass as input
   └──<language> # language of the tweet (e.g., 'en' for english)
 	      └── <tweet_id> # tweet id typically is a number (e.g., '1450915222089261059')
-				      ├── cited_article # directory of all media related to URLs cited in the tweet body text
-							│      └── <link_id>  # link id related to the cited URL (e.g., '0' )
-							│            └── images
-							│            │     └── <image_file> 
-							│            └── videos
-							│            │     └── <video_file> 
-							│            │
-							│            └── <top_image_file> # Image that correspond to the article's thumbnail
-							│            └── text_url.txt # text of the article
-							└── images
-							│     └── <image_file>  # Image embedded in the tweet body
-							└── videos
-									└── <video_file>  # Video embedded in the tweet body
+		      ├── cited_article # directory of all media related to URLs cited in the tweet body text
+		      │      └── <link_id>  # link id related to the cited URL (e.g., '0' )
+		      │            └── images
+		      │            │     └── <image_file> 
+		      │            └── videos
+		      │            │     └── <video_file> 
+		      │            │
+		      │            └── <top_image_file> # Image that correspond to the article's thumbnail
+		      │            └── text_url.txt # text of the article
+		      └── images
+		      │     └── <image_file>  # Image embedded in the tweet body
+		      └── videos
+		            └── <video_file>  # Video embedded in the tweet body
 
 ```
 
@@ -312,7 +312,7 @@ After downloading the tweets assets, you will find the media content of the Twee
 
 ##### AUTHORS
 
-João Phillipe and  José Nascimento,
+Phillipe Cardenuto and José Nascimento,
 
 ```
 				 UNICAMP (University of Campinas) RECOD.AI
