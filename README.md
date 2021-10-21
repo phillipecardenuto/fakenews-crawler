@@ -60,7 +60,7 @@ Download images and videos content embedded in the tweet (shown in the tweet bod
 
 #### 3.1 Tweet Photos/Images (shown in the tweet body)
 
-**3.1.1 Download Photos/Images Sequentially **
+**3.1.1 Download Photos/Images Sequentially**
 
 ```python
 from fncrawl.tweetDB import TweetDB
@@ -79,7 +79,7 @@ for tweet in tqdm(tweets):
     download_tweet_photos(tweet, savepath)
 ```
 
-**3.1.2 Download Photos/Images Parallel **
+**3.1.2 Download Photos/Images Parallel**
 
 ```python
 from fncrawl.tweetDB import TweetDB
@@ -104,7 +104,7 @@ process_map (pcall_download_tweet_photos,
 
 #### 3.2 Tweet Videos (shown in the tweet body)
 
-**3.2.1 Download Videos Sequentially **
+**3.2.1 Download Videos Sequentially**
 
 ```python
 from fncrawl.tweetDB import TweetDB
@@ -123,7 +123,7 @@ for tweet in tqdm(tweets):
     download_tweet_videos_from_link(tweet, savepath)
 ```
 
-**3.2.2 Download Videos Parallel **
+**3.2.2 Download Videos Parallel**
 
 ```python
 from fncrawl.tweetDB import TweetDB
@@ -289,33 +289,33 @@ All scrapped tweets follows the [twint](https://github.com/twintproject/twint) d
 After downloading the tweets assets, you will find the media content of the Tweets organized as:
 
 ```bash
-<savepath> # base directory of the media database pass as input
-        └──   <language> # language of the tweet (e.g., 'en' for english)
-                            └── <tweet_id> # tweet id typically is a number (e.g., '1450915222089261059')
-                                            ├── cited_article # directory of all media related to URLs cited in the tweet body text
-                                            │  			 └── <link_id>  # link id related to the cited URL (e.g., '0' )
-                                            │      					 └── images
-                                            │                        │            └── <image_file> 
-                                            │      					 └── videos
-                                            │                        │            └── <video_file> 
-                                            │                        │
-                                            │      					 └── <top_image_file> # Image that correspond to the article's thumbnail
-                                            │      					 └── text_url.txt # text of the article
-                                            └── images
-                                            │          └── <image_file>  # Image embedded in the tweet body
-											└── videos
-                                                         └── <video_file>  # Video embedded in the tweet body
-                                                      					 
+<savepath> # base directory of the media database (input savepath)
+  └──<language> # language of the tweet (e.g., 'en' for english)
+	      └── <tweet_id> # tweet id typically is a number (e.g., '1450915222089261059')
+		      ├── cited_article # directory of all media related to URLs cited in the tweet body text
+		      │      └── <link_id>  # link id related to the cited URL (e.g., '0' )
+		      │            └── images
+		      │            │     └── <image_file> 
+		      │            └── videos
+		      │            │     └── <video_file> 
+		      │            │
+		      │            └── <top_image_file> # Image that correspond to the article's thumbnail
+		      │            └── text_url.txt # text of the article
+		      └── images
+		      │     └── <image_file>  # Image embedded in the tweet body
+		      └── videos
+		            └── <video_file>  # Video embedded in the tweet body
+
 ```
 
 
 
 ##### AUTHORS
 
-João Phillipe and  José Nascimento,
+Phillipe Cardenuto and José Nascimento,
 
 ```
-				 UNICAMP (University of Campinas) RECOD Lab
+		                     UNICAMP (University of Campinas) RECOD.AI
 ```
 
 *If you find any bug, please do not hesitate to create a new issue*
