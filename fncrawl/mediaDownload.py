@@ -415,7 +415,7 @@ def download_tweet_media_from_urls(tweet: Dict,
                          save_dir: str,
                          max_duration: int  = 300):
     """
-    Download associated url videos cited in tweet text using youtube-dl
+    Download associated url videos or photo cited in tweet text using youtube-dl
     Args:
         tweet: Tweet document in dict format
         save_dir: Path to output directory
